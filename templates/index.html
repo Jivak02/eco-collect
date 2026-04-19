@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}EcoCollect — Dispose E-Waste Responsibly{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-7">
+                <span class="badge bg-success bg-opacity-25 text-success px-3 py-2 mb-3 fs-6">
+                    <i class="bi bi-shield-check me-1"></i> Certified E-Waste Management
+                </span>
+                <h1 class="display-3 fw-800 text-dark mb-3">
+                    Dispose E-Waste<br>
+                    <span class="text-eco-gradient">Responsibly</span>
+                </h1>
+                <p class="lead text-muted mb-4 pe-lg-5">
+                    Schedule doorstep pickups for your electronic waste. We ensure safe collection, 
+                    certified segregation, and eco-friendly recycling — all at no cost to you.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{% if current_user.is_authenticated %}{{ url_for('new_request') }}{% else %}{{ url_for('register') }}{% endif %}" 
+                       class="btn btn-eco btn-lg px-4 shadow-sm">
+                        <i class="bi bi-calendar2-check me-2"></i>Schedule a Pickup
+                    </a>
+                    <a href="#how-it-works" class="btn btn-outline-secondary btn-lg px-4">
+                        Learn More <i class="bi bi-arrow-down-short"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block text-center">
+                <div class="hero-illustration">
+                    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" width="380">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#1D9E75;stop-opacity:0.15"/>
+                                <stop offset="100%" style="stop-color:#16a085;stop-opacity:0.05"/>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="200" cy="200" r="180" fill="url(#grad1)"/>
+                        <circle cx="200" cy="200" r="130" fill="none" stroke="#1D9E75" stroke-width="2" stroke-dasharray="8,6" opacity="0.3"/>
+                        <!-- Recycle symbol -->
+                        <g transform="translate(200,200)" opacity="0.7">
+                            <path d="M0,-70 L25,-30 L-25,-30 Z" fill="#1D9E75" transform="rotate(0)"/>
+                            <path d="M0,-70 L25,-30 L-25,-30 Z" fill="#27ae60" transform="rotate(120)"/>
+                            <path d="M0,-70 L25,-30 L-25,-30 Z" fill="#2ecc71" transform="rotate(240)"/>
+                            <circle cx="0" cy="0" r="20" fill="white"/>
+                            <text x="0" y="7" text-anchor="middle" fill="#1D9E75" font-size="18" font-weight="bold">♻</text>
+                        </g>
+                        <!-- Floating device icons -->
+                        <g opacity="0.5">
+                            <rect x="90" y="80" width="35" height="50" rx="5" fill="none" stroke="#1D9E75" stroke-width="2"/>
+                            <line x1="100" y1="120" x2="115" y2="120" stroke="#1D9E75" stroke-width="2"/>
+                            <rect x="280" y="100" width="50" height="35" rx="4" fill="none" stroke="#27ae60" stroke-width="2"/>
+                            <rect x="290" y="108" width="30" height="20" rx="2" fill="none" stroke="#27ae60" stroke-width="1.5"/>
+                            <rect x="120" y="270" width="45" height="40" rx="3" fill="none" stroke="#2ecc71" stroke-width="2"/>
+                            <circle cx="142" cy="300" r="5" fill="none" stroke="#2ecc71" stroke-width="1.5"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it Works -->
+<section class="py-5 bg-light" id="how-it-works">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">How It Works</h2>
+            <p class="text-muted">Three simple steps to responsible e-waste disposal</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card h-100 border-0 shadow-sm text-center p-4">
+                    <div class="feature-icon mx-auto mb-3">
+                        <i class="bi bi-box-seam fs-1 text-eco"></i>
+                    </div>
+                    <h5 class="fw-semibold">Collection</h5>
+                    <p class="text-muted mb-0">Schedule a free doorstep pickup. Our trained agents collect your e-waste safely and securely.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card h-100 border-0 shadow-sm text-center p-4">
+                    <div class="feature-icon mx-auto mb-3">
+                        <i class="bi bi-funnel fs-1 text-eco"></i>
+                    </div>
+                    <h5 class="fw-semibold">Segregation</h5>
+                    <p class="text-muted mb-0">Each item is categorized and separated by material type for optimal recovery and safe handling.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card h-100 border-0 shadow-sm text-center p-4">
+                    <div class="feature-icon mx-auto mb-3">
+                        <i class="bi bi-arrow-repeat fs-1 text-eco"></i>
+                    </div>
+                    <h5 class="fw-semibold">Recycling</h5>
+                    <p class="text-muted mb-0">Certified recyclers extract valuable materials while ensuring zero landfill and minimal emissions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="eco-stats-bar py-5">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-4">
+                <div class="stat-item">
+                    <h2 class="fw-800 text-eco mb-1 stat-number">{{ total_pickups }}</h2>
+                    <p class="text-muted mb-0 fw-medium">Pickups Done</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-item">
+                    <h2 class="fw-800 text-eco mb-1 stat-number">{{ co2_saved }} <small class="fs-5">Tonnes</small></h2>
+                    <p class="text-muted mb-0 fw-medium">CO₂ Saved</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-item">
+                    <h2 class="fw-800 text-eco mb-1 stat-number">{{ recycle_rate }}%</h2>
+                    <p class="text-muted mb-0 fw-medium">Recycled</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% block title %}New Pickup Request — EcoCollect{% endblock %}
+
+{% block body %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <nav class="sidebar d-flex flex-column p-3">
+        <a class="navbar-brand fw-bold text-white mb-4 d-flex align-items-center" href="{{ url_for('index') }}">
+            <i class="bi bi-recycle me-2 fs-4"></i>
+            <span>EcoCollect</span>
+        </a>
+        <ul class="nav flex-column gap-1">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('dashboard') }}">
+                    <i class="bi bi-grid-1x2 me-2"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ url_for('new_request') }}">
+                    <i class="bi bi-plus-circle me-2"></i>New Request
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('centers') }}">
+                    <i class="bi bi-geo-alt me-2"></i>Centers
+                </a>
+            </li>
+        </ul>
+        <div class="mt-auto">
+            <hr class="border-light opacity-25">
+            <div class="d-flex align-items-center text-white-50 small mb-2">
+                <i class="bi bi-person-circle me-2"></i>
+                <span class="text-truncate">{{ current_user.email }}</span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm w-100">
+                <i class="bi bi-box-arrow-left me-1"></i>Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content flex-grow-1">
+        <!-- Flash messages -->
+        <div class="px-4 pt-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <div class="p-4">
+            <div class="mb-4">
+                <h4 class="fw-bold mb-1">New Pickup Request</h4>
+                <p class="text-muted mb-0">Fill in the details for your e-waste pickup</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Form -->
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <form method="POST" action="{{ url_for('new_request') }}">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="waste_type" class="form-label fw-medium">Waste Type <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="waste_type" name="waste_type" required>
+                                            <option value="">Select type...</option>
+                                            <option value="Smartphone/Tablet">Smartphone / Tablet</option>
+                                            <option value="Laptop/Desktop">Laptop / Desktop</option>
+                                            <option value="Batteries">Batteries</option>
+                                            <option value="Circuit Boards">Circuit Boards</option>
+                                            <option value="Printer/Scanner">Printer / Scanner</option>
+                                            <option value="Cables/Chargers">Cables / Chargers</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="quantity" class="form-label fw-medium">Quantity <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="1" required placeholder="Number of items">
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="area" class="form-label fw-medium">Area / Locality <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="area" name="area" required placeholder="e.g. Koramangala, Bangalore">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="pickup_date" class="form-label fw-medium">Preferred Pickup Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="pickup_date" name="pickup_date" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="time_slot" class="form-label fw-medium">Time Slot <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="time_slot" name="time_slot" required>
+                                            <option value="">Select slot...</option>
+                                            <option value="Morning 9am-12pm">Morning 9am – 12pm</option>
+                                            <option value="Afternoon 12pm-4pm">Afternoon 12pm – 4pm</option>
+                                            <option value="Evening 4pm-7pm">Evening 4pm – 7pm</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="notes" class="form-label fw-medium">Notes <span class="text-muted">(optional)</span></label>
+                                        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Any special instructions..."></textarea>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-eco w-100 mt-4 py-2 fw-semibold">
+                                    <i class="bi bi-send me-2"></i>Submit Request
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Smart Classification Card -->
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm classification-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="classification-icon me-3">
+                                    <i class="bi bi-cpu fs-4 text-eco"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0">Smart Classification</h6>
+                                    <small class="text-muted">AI-powered waste analysis</small>
+                                </div>
+                            </div>
+                            <div id="classification-placeholder" class="text-center py-4">
+                                <i class="bi bi-arrow-left-circle fs-1 text-muted opacity-50"></i>
+                                <p class="text-muted mt-2 mb-0">Select a waste type to see classification details</p>
+                            </div>
+                            <div id="classification-result" class="d-none">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small mb-1">Hazard Level</label>
+                                    <div id="hazard-level">
+                                        <span class="badge fs-6 px-3 py-2" id="hazard-badge">—</span>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small mb-1">Suggested Disposal Method</label>
+                                    <p class="fw-medium mb-0" id="disposal-method">—</p>
+                                </div>
+                                <div>
+                                    <label class="form-label text-muted small mb-1">Materials Recoverable</label>
+                                    <div id="materials-list" class="d-flex flex-wrap gap-2">
+                                        <!-- filled dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm mt-3 bg-eco-light-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-lightbulb text-eco fs-4 me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="fw-semibold mb-1">Did you know?</h6>
+                                    <p class="text-muted small mb-0">
+                                        One tonne of circuit boards contains 40–800 times more gold than 
+                                        one tonne of gold ore. Recycling e-waste isn't just good for the 
+                                        planet — it's a goldmine!
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const classificationData = {
+    "Smartphone/Tablet": {
+        hazard: "High",
+        hazardColor: "danger",
+        disposal: "Certified e-waste recycler",
+        materials: ["Gold", "Lithium", "Copper"]
+    },
+    "Laptop/Desktop": {
+        hazard: "High",
+        hazardColor: "danger",
+        disposal: "Certified e-waste recycler",
+        materials: ["Gold", "Aluminum", "Copper"]
+    },
+    "Batteries": {
+        hazard: "High",
+        hazardColor: "danger",
+        disposal: "Battery specialist only",
+        materials: ["Lithium", "Cobalt", "Nickel"]
+    },
+    "Circuit Boards": {
+        hazard: "High",
+        hazardColor: "danger",
+        disposal: "Precious metal extractor",
+        materials: ["Gold", "Silver", "Palladium"]
+    },
+    "Printer/Scanner": {
+        hazard: "Medium",
+        hazardColor: "warning",
+        disposal: "General e-waste center",
+        materials: ["Plastic", "Steel", "Copper"]
+    },
+    "Cables/Chargers": {
+        hazard: "Low",
+        hazardColor: "success",
+        disposal: "Any collection center",
+        materials: ["Copper", "Plastic"]
+    },
+    "Other": {
+        hazard: "Medium",
+        hazardColor: "warning",
+        disposal: "Contact nearest center",
+        materials: ["Varies"]
+    }
+};
+
+document.getElementById('waste_type').addEventListener('change', function () {
+    const val = this.value;
+    const placeholder = document.getElementById('classification-placeholder');
+    const result = document.getElementById('classification-result');
+
+    if (!val || !classificationData[val]) {
+        placeholder.classList.remove('d-none');
+        result.classList.add('d-none');
+        return;
+    }
+
+    const data = classificationData[val];
+    placeholder.classList.add('d-none');
+    result.classList.remove('d-none');
+
+    const badge = document.getElementById('hazard-badge');
+    badge.textContent = data.hazard;
+    badge.className = `badge fs-6 px-3 py-2 bg-${data.hazardColor}`;
+    if (data.hazardColor === 'warning') badge.classList.add('text-dark');
+
+    document.getElementById('disposal-method').textContent = data.disposal;
+
+    const materialsContainer = document.getElementById('materials-list');
+    materialsContainer.innerHTML = data.materials.map(m =>
+        `<span class="badge bg-light text-dark border px-3 py-2"><i class="bi bi-gem me-1 text-eco"></i>${m}</span>`
+    ).join('');
+});
+
+// Set min date to today
+document.getElementById('pickup_date').min = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

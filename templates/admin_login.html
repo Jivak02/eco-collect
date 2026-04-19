@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Admin Login — EcoCollect{% endblock %}
+
+{% block content %}
+<section class="auth-section d-flex align-items-center min-vh-75">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="card shadow-sm border-0 p-4">
+                    <div class="text-center mb-4">
+                        <div class="auth-icon mb-3">
+                            <i class="bi bi-shield-lock fs-1 text-eco"></i>
+                        </div>
+                        <h3 class="fw-bold">Admin Access</h3>
+                        <p class="text-muted">Enter your admin credentials</p>
+                    </div>
+                    <form method="POST" action="{{ url_for('admin_login') }}">
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-medium">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
+                                <input type="text" class="form-control border-start-0" id="username" name="username" placeholder="admin" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-medium">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                                <input type="password" class="form-control border-start-0" id="password" name="password" placeholder="••••••••" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-eco w-100 py-2 fw-semibold">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In as Admin
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

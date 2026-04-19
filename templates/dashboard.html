@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — EcoCollect{% endblock %}
+
+{% block body %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <nav class="sidebar d-flex flex-column p-3">
+        <a class="navbar-brand fw-bold text-white mb-4 d-flex align-items-center" href="{{ url_for('index') }}">
+            <i class="bi bi-recycle me-2 fs-4"></i>
+            <span>EcoCollect</span>
+        </a>
+        <ul class="nav flex-column gap-1">
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ url_for('dashboard') }}">
+                    <i class="bi bi-grid-1x2 me-2"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('new_request') }}">
+                    <i class="bi bi-plus-circle me-2"></i>New Request
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('centers') }}">
+                    <i class="bi bi-geo-alt me-2"></i>Centers
+                </a>
+            </li>
+        </ul>
+        <div class="mt-auto">
+            <hr class="border-light opacity-25">
+            <div class="d-flex align-items-center text-white-50 small mb-2">
+                <i class="bi bi-person-circle me-2"></i>
+                <span class="text-truncate">{{ current_user.email }}</span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm w-100">
+                <i class="bi bi-box-arrow-left me-1"></i>Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content flex-grow-1">
+        <!-- Flash messages -->
+        <div class="px-4 pt-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <div class="p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="fw-bold mb-1">Dashboard</h4>
+                    <p class="text-muted mb-0">Overview of your e-waste pickups</p>
+                </div>
+                <a href="{{ url_for('new_request') }}" class="btn btn-eco">
+                    <i class="bi bi-plus-lg me-2"></i>New Pickup Request
+                </a>
+            </div>
+
+            <!-- Stat Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card stat-card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small mb-1">Total Requests</p>
+                                    <h3 class="fw-bold mb-0">{{ total }}</h3>
+                                </div>
+                                <div class="stat-icon bg-eco-light">
+                                    <i class="bi bi-inbox text-eco"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card stat-card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small mb-1">CO₂ Saved</p>
+                                    <h3 class="fw-bold mb-0">{{ co2 }} <small class="fs-6 fw-normal text-muted">kg</small></h3>
+                                </div>
+                                <div class="stat-icon bg-info-light">
+                                    <i class="bi bi-cloud-sun text-info"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card stat-card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small mb-1">Reward Points</p>
+                                    <h3 class="fw-bold mb-0">{{ points }}</h3>
+                                </div>
+                                <div class="stat-icon bg-warning-light">
+                                    <i class="bi bi-star text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="card stat-card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="text-muted small mb-1">Items Recycled</p>
+                                    <h3 class="fw-bold mb-0">{{ recycled }}</h3>
+                                </div>
+                                <div class="stat-icon bg-success-light">
+                                    <i class="bi bi-check-circle text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requests Table -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h6 class="fw-semibold mb-0">Your Pickup Requests</h6>
+                </div>
+                <div class="card-body p-0">
+                    {% if requests|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Waste Type</th>
+                                    <th>Quantity</th>
+                                    <th>Area</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for req in requests %}
+                                <tr>
+                                    <td class="ps-4 fw-medium">{{ req.waste_type }}</td>
+                                    <td>{{ req.quantity }}</td>
+                                    <td>{{ req.area }}</td>
+                                    <td>{{ req.pickup_date.strftime('%b %d, %Y') }}</td>
+                                    <td>
+                                        {% if req.status == 'Pending' %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        {% elif req.status == 'Collected' %}
+                                        <span class="badge bg-primary">Collected</span>
+                                        {% elif req.status == 'Processing' %}
+                                        <span class="badge bg-secondary">Processing</span>
+                                        {% elif req.status == 'Recycled' %}
+                                        <span class="badge bg-success">Recycled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('track', request_id=req.id) }}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-eye me-1"></i>Track
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox fs-1 text-muted"></i>
+                        <p class="text-muted mt-2 mb-3">No pickup requests yet.</p>
+                        <a href="{{ url_for('new_request') }}" class="btn btn-eco btn-sm">
+                            <i class="bi bi-plus-lg me-1"></i>Create Your First Request
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Track Request #{{ req.id }} — EcoCollect{% endblock %}
+
+{% block body %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <nav class="sidebar d-flex flex-column p-3">
+        <a class="navbar-brand fw-bold text-white mb-4 d-flex align-items-center" href="{{ url_for('index') }}">
+            <i class="bi bi-recycle me-2 fs-4"></i>
+            <span>EcoCollect</span>
+        </a>
+        <ul class="nav flex-column gap-1">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('dashboard') }}">
+                    <i class="bi bi-grid-1x2 me-2"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('new_request') }}">
+                    <i class="bi bi-plus-circle me-2"></i>New Request
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('centers') }}">
+                    <i class="bi bi-geo-alt me-2"></i>Centers
+                </a>
+            </li>
+        </ul>
+        <div class="mt-auto">
+            <hr class="border-light opacity-25">
+            <div class="d-flex align-items-center text-white-50 small mb-2">
+                <i class="bi bi-person-circle me-2"></i>
+                <span class="text-truncate">{{ current_user.email }}</span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm w-100">
+                <i class="bi bi-box-arrow-left me-1"></i>Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content flex-grow-1">
+        <div class="p-4">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h4 class="fw-bold mb-0">Track Request #{{ req.id }}</h4>
+                    <p class="text-muted mb-0 small">Submitted {{ req.submitted_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Request Details -->
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0 py-3">
+                            <h6 class="fw-semibold mb-0"><i class="bi bi-info-circle me-2 text-eco"></i>Request Details</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label class="form-label text-muted small mb-0">Waste Type</label>
+                                    <p class="fw-medium mb-0">{{ req.waste_type }}</p>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label text-muted small mb-0">Quantity</label>
+                                    <p class="fw-medium mb-0">{{ req.quantity }} item{{ 's' if req.quantity != 1 }}</p>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label text-muted small mb-0">Area</label>
+                                    <p class="fw-medium mb-0">{{ req.area }}</p>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label text-muted small mb-0">Pickup Date</label>
+                                    <p class="fw-medium mb-0">{{ req.pickup_date.strftime('%b %d, %Y') }}</p>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label text-muted small mb-0">Time Slot</label>
+                                    <p class="fw-medium mb-0">{{ req.time_slot }}</p>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label text-muted small mb-0">Current Status</label>
+                                    <p class="mb-0">
+                                        {% if req.status == 'Pending' %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        {% elif req.status == 'Collected' %}
+                                        <span class="badge bg-primary">Collected</span>
+                                        {% elif req.status == 'Processing' %}
+                                        <span class="badge bg-secondary">Processing</span>
+                                        {% elif req.status == 'Recycled' %}
+                                        <span class="badge bg-success">Recycled</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-muted small mb-0">Assigned Center</label>
+                                    <p class="fw-medium mb-0"><i class="bi bi-building me-1 text-eco"></i>{{ req.assigned_center }}</p>
+                                </div>
+                                {% if req.notes %}
+                                <div class="col-12">
+                                    <label class="form-label text-muted small mb-0">Notes</label>
+                                    <p class="fw-medium mb-0">{{ req.notes }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0 py-3">
+                            <h6 class="fw-semibold mb-0"><i class="bi bi-clock-history me-2 text-eco"></i>Tracking Timeline</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="timeline">
+                                {% for step in steps %}
+                                <div class="timeline-step {{ 'completed' if step.completed else 'pending' }}">
+                                    <div class="timeline-dot">
+                                        {% if step.completed %}
+                                        <i class="bi bi-check-lg"></i>
+                                        {% endif %}
+                                    </div>
+                                    {% if not loop.last %}
+                                    <div class="timeline-connector {{ 'completed' if step.completed and steps[loop.index].completed else '' }}"></div>
+                                    {% endif %}
+                                    <div class="timeline-content">
+                                        <h6 class="fw-semibold mb-1 {{ 'text-eco' if step.completed else 'text-muted' }}">{{ step.label }}</h6>
+                                        {% if step.completed %}
+                                        <small class="text-muted">Completed</small>
+                                        {% else %}
+                                        <small class="text-muted">Pending</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
